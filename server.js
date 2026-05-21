@@ -3,7 +3,7 @@ const http = require("http");
 const path = require("path");
 const { Server } = require("socket.io");
 
-const mysql = require("mysql2");
+//const mysql = require("mysql2");
 
 //const mysql = require("mysql2");
 
@@ -18,13 +18,13 @@ const db = mysql.createConnection({
   database: "live_chat",
 });
 
-db.connect((err) => {
-  if (err) {
-    console.log("MySQL connection error:", err);
-    return;
-  }
-  console.log("MySQL connected");
-});
+// db.connect((err) => {
+//   if (err) {
+//     console.log("MySQL connection error:", err);
+//     return;
+//   }
+//   console.log("MySQL connected");
+// });
 // const db = mysql.createConnection({
 //   host: "localhost",
 //   user: "root",
