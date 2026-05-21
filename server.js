@@ -2,17 +2,15 @@ const express = require("express");
 const http = require("http");
 const path = require("path");
 const { Server } = require("socket.io");
-<<<<<<< HEAD
+
 const mysql = require("mysql2");
-=======
+
 //const mysql = require("mysql2");
->>>>>>> a07067f34aed7859e707e2ef9e02e3731e6dcde5
+
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-
-<<<<<<< HEAD
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -27,7 +25,6 @@ db.connect((err) => {
   }
   console.log("MySQL connected");
 });
-=======
 // const db = mysql.createConnection({
 //   host: "localhost",
 //   user: "root",
@@ -42,7 +39,6 @@ db.connect((err) => {
 //   }
 //   console.log("MySQL connected");
 // });
->>>>>>> a07067f34aed7859e707e2ef9e02e3731e6dcde5
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -138,8 +134,6 @@ io.on("connection", (socket) => {
 const PORT = 5000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-<<<<<<< HEAD
+
 }); 
-=======
-}); 
->>>>>>> a07067f34aed7859e707e2ef9e02e3731e6dcde5
+
