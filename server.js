@@ -2,26 +2,26 @@ const express = require("express");
 const http = require("http");
 const path = require("path");
 const { Server } = require("socket.io");
-const mysql = require("mysql2");
+//const mysql = require("mysql2");
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "1234",
-  database: "live_chat",
-});
+// const db = mysql.createConnection({
+//   host: "localhost",
+//   user: "root",
+//   password: "1234",
+//   database: "live_chat",
+// });
 
-db.connect((err) => {
-  if (err) {
-    console.log("MySQL connection error:", err);
-    return;
-  }
-  console.log("MySQL connected");
-});
+// db.connect((err) => {
+//   if (err) {
+//     console.log("MySQL connection error:", err);
+//     return;
+//   }
+//   console.log("MySQL connected");
+// });
 
 app.use(express.static(path.join(__dirname, "public")));
 
