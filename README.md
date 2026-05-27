@@ -1,221 +1,138 @@
-# Real-Time Chat and User Tracking System
+# 🚀 Modern Real-Time LAN Chat and User Tracking System
 
-A browser-based real-time communication platform built using Node.js, Express.js, Socket.IO, and MySQL. This project enables instant messaging, live user tracking, and real-time communication within a local network environment. 
+A modern browser-based real-time communication platform built using **Node.js, Express.js, Socket.IO, MongoDB, and Glassmorphism UI Design**.  
 
----
-
-## 📌 Project Overview
-
-The **Real-Time Chat and User Tracking System** is designed to provide fast and efficient communication between users over a LAN or local environment. The application uses WebSocket technology through Socket.IO to deliver instant message transmission without page refresh. 
-
-The system supports:
-
-* Real-time messaging
-* Online user tracking
-* Typing indicators
-* Dynamic user updates
-* Database storage for messages and users
+This project enables fast and secure communication between multiple users connected within the same Local Area Network (LAN). The system supports real-time messaging, live user tracking, voice notes, file sharing, QR-based LAN connection, and dynamic modern UI features inspired by modern messaging applications like WhatsApp and Telegram.
 
 ---
 
-## 🚀 Features
+# 📌 Project Overview
 
-* ⚡ Instant real-time messaging
-* 👥 Online user tracking
-* ✍️ Typing indicator support
-* 💾 MySQL database integration
-* 📱 Responsive user interface
-* 🔄 Dynamic socket communication
-* 🧠 Event-driven architecture
+The **Modern Real-Time LAN Chat and User Tracking System** is designed to provide seamless communication between devices connected on the same network.  
 
+The application uses **Socket.IO WebSocket technology** for instant bi-directional communication without requiring page refreshes. Messages are transmitted in real time and stored inside a MongoDB database for persistence.
 
+The project focuses on:
 
+- Real-time communication
+- LAN networking
+- User activity monitoring
+- File and media sharing
+- Voice note support
+- Responsive modern interface
+- Event-driven architecture
 
----
-
-## 🛠️ Technologies Used
-
-### Backend
-
-* Node.js
-* Express.js
-* Socket.IO
-* MySQL
-
-### Frontend
-
-* HTML
-* CSS
-* JavaScript
-
-### Development Tools
-
-* Visual Studio Code
-* Web Browser
-
-
+This system can be used for:
+- Educational purposes
+- Office/local communication
+- LAN-based messaging
+- Networking projects
+- Real-time system demonstrations
 
 ---
 
-## 📂 Project Structure
+# ✨ Features
+
+## 💬 Real-Time Messaging
+- Instant communication using Socket.IO
+- Low-latency LAN messaging
+- Dynamic message updates
+
+## 👥 Live User Tracking
+- Displays connected users in real time
+- Dynamic online device count
+- Join/Leave notifications
+
+## 🕒 Message Timestamp
+- Every message contains live timestamp
+- WhatsApp-style time display
+
+## ✍️ Typing Indicator
+- Shows when another user is typing
+
+## 😊 Emoji Chat Support
+- Interactive emoji picker
+- Emoji message support
+
+## 🎤 Voice Notes
+- Record and send voice messages
+- Browser-based audio recording
+
+## 📁 File Sharing
+Users can upload and share:
+- Images
+- Videos
+- Audio files
+- Documents
+
+## 🖼 Media Preview
+- Image preview support
+- Video preview support
+- Audio player integration
+
+## 📡 QR-Based LAN Connection
+- QR code generation for quick connection
+- Easy device joining within LAN
+
+## 💾 MongoDB Database Integration
+- Stores chat messages
+- Stores message metadata
+- Persistent chat history
+
+## 🎨 Modern Glassmorphism UI
+- WhatsApp-inspired interface
+- Animated network background
+- Blur effects and smooth transitions
+
+## 📱 Responsive Design
+- Desktop support
+- Tablet support
+- Mobile support
+
+## ⚡ Event-Driven Architecture
+- Real-time socket communication
+- Dynamic frontend rendering
+- Live updates without reload
+
+---
+
+# 🛠️ Technologies Used
+
+## Backend
+- Node.js
+- Express.js
+- Socket.IO
+- MongoDB
+- Mongoose
+- Multer
+- QRCode
+
+## Frontend
+- HTML5
+- CSS3
+- JavaScript
+
+## Development Tools
+- Visual Studio Code
+- MongoDB Compass
+- Browser Developer Tools
+
+---
+
+# 📂 Project Structure
 
 ```bash
-project-folder/
+LAN-CHAT-SYSTEM/
+│
+├── node_modules/
 │
 ├── public/
+│   ├── uploads/
 │   ├── index.html
 │   ├── style.css
-│   └── script.js
+│   └── app.js
 │
-├── server.js
+├── .env
 ├── package.json
 ├── package-lock.json
-└── database.sql
-```
-
----
-
-## ⚙️ Installation & Setup
-
-### 1️⃣ Clone the Repository
-
-```bash
-git clone https://github.com/your-username/your-repository-name.git
-cd your-repository-name
-```
-
-### 2️⃣ Install Dependencies
-
-```bash
-npm install
-```
-
-### 3️⃣ Configure MySQL Database
-
-Create a MySQL database and import required tables.
-
-### Users Table
-
-```sql
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    socket_id VARCHAR(255),
-    username VARCHAR(100),
-    connected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    disconnected_at TIMESTAMP NULL,
-    status VARCHAR(20)
-);
-```
-
-### Messages Table
-
-```sql
-CREATE TABLE messages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    message TEXT,
-    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-
-
----
-
-## ▶️ Run the Project
-
-```bash
-node server.js
-```
-
-Open your browser and visit:
-
-```bash
-http://localhost:3000
-```
-
----
-
-## 🔄 Working Procedure
-
-1. User opens the application
-2. User enters a username
-3. Socket connection is established
-4. User joins the chat room
-5. Messages are transmitted instantly
-6. Messages are stored in the database
-7. Online users update dynamically
-8. Disconnect events are recorded
-
-
-
----
-
-## 🧪 Testing
-
-The application was tested successfully for:
-
-* User joining
-* Real-time message delivery
-* Online user display
-* Database storage
-* Disconnect handling
-
-
-
----
-
-## 📈 Future Enhancements
-
-* User authentication
-* Private chat system
-* Voice & video calling
-* Media/file sharing
-* Group chat support
-* Notification system
-* Cloud deployment
-* Mobile application support
-* End-to-end encryption
-
-
-
----
-
-## 🎯 Advantages
-
-* Fast communication
-* Lightweight architecture
-* Easy-to-use interface
-* Efficient database handling
-* Real-time user updates
-
-
-
----
-
-## 📚 Learning Outcomes
-
-This project helped in understanding:
-
-* Real-time networking concepts
-* WebSocket communication
-* Client-server architecture
-* Database connectivity
-* Event-driven programming
-* Modern web application development
-
-
-
----
-
-## 👨‍💻 Author
-
-**Vivek Gupta**
-Computer Science & Engineering
-Arka Jain University, Jamshedpur
-
----
-
-## 📄 License
-
-This project is developed for educational and academic purposes.
+└── server.js
