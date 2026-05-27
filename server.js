@@ -1,85 +1,355 @@
+
+ const os = require("os");
+ require("dotenv").config();
 const express = require("express");
+
 const http = require("http");
-const path = require("path");
+
 const { Server } = require("socket.io");
 
+const mongoose = require("mongoose");
+
+const multer = require("multer");
+
+
+
+const QRCode = require("qrcode");
+
+/* ========================= */
+
 const app = express();
+
 const server = http.createServer(app);
+
 const io = new Server(server);
 
-app.use(express.static(path.join(__dirname, "public")));
+/* =========================
+   MONGODB
+========================= */
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+mongoose.connect(
+  process.env.MONGO_URI
+)
+
+.then(()=>{
+
+  console.log("MongoDB Connected");
+
+})
+
+.catch((err)=>{
+
+  console.log(err);
 });
 
-const onlineUsers = new Map();
+/* =========================
+   MESSAGE SCHEMA
+========================= */
 
-io.on("connection", (socket) => {
-  console.log("connected:", socket.id);
+const MessageSchema =
+new mongoose.Schema({
 
-  socket.on("join", ({ username }) => {
-    if (!username) return;
+  username:String,
 
-    onlineUsers.set(socket.id, {
-      socketId: socket.id,
-      username,
+  message:String,
+
+  time:String,
+
+  seen:Boolean
+
+});
+
+const Message =
+mongoose.model(
+  "Message",
+  MessageSchema
+);
+
+/* =========================
+   STATIC
+========================= */
+
+app.use(
+  express.static("public")
+);
+
+/* =========================
+   FILE STORAGE
+========================= */
+
+const storage =
+multer.diskStorage({
+
+  destination:
+  "public/uploads/",
+
+  filename:
+  (req,file,cb)=>{
+
+    cb(
+      null,
+      Date.now() +
+      "-" +
+      file.originalname
+    );
+  }
+});
+
+const upload =
+multer({storage});
+
+/* =========================
+   FILE UPLOAD
+========================= */
+
+app.post(
+  "/upload",
+
+  upload.single("file"),
+
+  (req,res)=>{
+
+    res.json({
+
+      file:req.file.filename
     });
+  }
+);
 
-    io.emit("system", {
-      text: `${username} joined the chat`,
-      time: new Date(),
-    });
+/* =========================
+   QR ROUTE
+========================= */
 
-    io.emit("online-users", {
-      users: Array.from(onlineUsers.values()),
-    });
+/* =========================
+   QR ROUTE
+========================= */
+
+app.get("/qr", async(req,res)=>{
+
+  const interfaces =
+  os.networkInterfaces();
+
+  let localIP =
+  "localhost";
+
+  for(const name in interfaces){
+
+    for(const net of interfaces[name]){
+
+      if(
+        net.family === "IPv4" &&
+        !net.internal
+      ){
+
+        localIP = net.address;
+      }
+    }
+  }
+
+  const url =
+  `http://${localIP}:${process.env.PORT}`;
+
+  const qr =
+  await QRCode.toDataURL(url);
+
+  res.send(`
+
+  <body
+  style="
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  background:#edf6ff;
+  font-family:Arial;
+  ">
+
+  <div
+  style="
+  text-align:center;
+  ">
+
+  <h1>
+  Scan To Join LAN
+  </h1>
+
+  <img
+  src="${qr}"
+  width="300">
+
+  <p>
+  ${url}
+  </p>
+
+  </div>
+
+  </body>
+  `);
+});
+
+
+/* =========================
+   USERS
+========================= */
+
+let users = {};
+
+/* =========================
+   SOCKET CONNECTION
+========================= */
+
+io.on(
+  "connection",
+  (socket)=>{
+
+  console.log(
+    "New Device Connected"
+  );
+
+  /* JOIN */
+
+  socket.on(
+    "join",
+    async(username)=>{
+
+    users[socket.id] =
+    username;
+
+    /* SEND USERS */
+
+    io.emit(
+      "users",
+      Object.values(users)
+    );
+
+    /* STATUS */
+
+    io.emit(
+      "chatMessage",
+      {
+
+      username:"SYSTEM",
+
+      message:
+      `🟢 ${username} joined the LAN`,
+
+      time:new Date()
+.toLocaleTimeString([],{
+  hour:'2-digit',
+  minute:'2-digit'
+}),
+
+      seen:true
+      }
+    );
+
+    /* OLD MESSAGES */
+
+    const oldMessages =
+    await Message.find();
+
+    socket.emit(
+      "oldMessages",
+      oldMessages
+    );
   });
 
-  socket.on("message", ({ text }) => {
-    const user = onlineUsers.get(socket.id);
+  /* TYPING */
 
-    if (!user || !text) return;
+  socket.on(
+    "typing",
+    (username)=>{
 
-    io.emit("message", {
-      username: user.username,
-      text,
-      time: new Date(),
-      own: false,
-    });
+    socket.broadcast.emit(
+      "typing",
+      username
+    );
   });
 
-  socket.on("typing", ({ isTyping }) => {
-    const user = onlineUsers.get(socket.id);
+  /* CHAT */
 
-    if (!user) return;
+socket.on(
+  "chatMessage",
+  async(data)=>{
 
-    socket.broadcast.emit("typing", {
-      username: user.username,
-      isTyping,
+    const msg =
+    new Message({
+
+      username:
+      data.username,
+
+      message:
+      data.message,
+
+      time:new Date()
+      .toLocaleTimeString([],{
+        hour:'2-digit',
+        minute:'2-digit'
+      }),
+
+      seen:true
     });
-  });
 
-  socket.on("disconnect", () => {
-    const user = onlineUsers.get(socket.id);
+    await msg.save();
 
-    if (!user) return;
+    io.emit(
+      "chatMessage",
+      msg
+    );
+});
 
-    onlineUsers.delete(socket.id);
+  /* DISCONNECT */
 
-    io.emit("system", {
-      text: `${user.username} left the chat`,
-      time: new Date(),
-    });
+  socket.on(
+    "disconnect",
+    ()=>{
 
-    io.emit("online-users", {
-      users: Array.from(onlineUsers.values()),
-    });
+    const username =
+users[socket.id] || "Unknown User";
+
+    delete users[socket.id];
+
+    io.emit(
+      "users",
+      Object.values(users)
+    );
+
+    io.emit(
+      "chatMessage",
+      {
+
+      username:"SYSTEM",
+
+      message:
+      `🔴 ${username} left the LAN`,
+
+      time:new Date()
+.toLocaleTimeString([],{
+  hour:'2-digit',
+  minute:'2-digit'
+}),
+
+      seen:true
+      }
+    );
+
+    console.log(
+      "Device Disconnected"
+    );
   });
 });
 
-const PORT = process.env.PORT || 5000;
+/* =========================
+   SERVER
+========================= */
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+server.listen(
+  process.env.PORT,
+  "0.0.0.0",
+  ()=>{
+
+ console.log(
+  `Server Running:
+  http://localhost:${process.env.PORT}`
+);
 });
