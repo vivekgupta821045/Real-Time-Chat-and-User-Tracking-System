@@ -1,155 +1,474 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Glass LAN Chat</title>
 
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0">
+
+  <title>LAN CHAT</title>
+
+  <!-- CSS -->
+
+  <link
+  rel="stylesheet"
+  href="style.css">
+
+  <!-- FONT -->
+
+  <link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+  rel="stylesheet">
+
+  <!-- SOCKET -->
+
+  <script src="/socket.io/socket.io.js"></script>
+
 </head>
+
 <body>
 
-  <div class="bg-blur blur1"></div>
-  <div class="bg-blur blur2"></div>
-  <div class="grid"></div>
+<!-- =========================
+     GRID
+========================= -->
 
-  <!-- JOIN SCREEN -->
+<div class="grid"></div>
 
-  <section class="join-screen" id="join-screen">
+<!-- =========================
+     BLUR EFFECTS
+========================= -->
 
-    <div class="join-card">
+<div class="bg-blur blur1"></div>
 
-      <!-- EMPLOYEE LOGO -->
+<div class="bg-blur blur2"></div>
 
-<div class="logo-circle">
+<!-- =========================
+     NETWORK SVG
+========================= -->
 
-  <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="employee logo">
+<div class="network-bg">
+
+<svg viewBox="0 0 1400 800">
+
+  <!-- SERVER BOX -->
+
+  <rect
+  x="520"
+  y="160"
+  width="180"
+  height="110"
+  rx="22"
+  class="server-box"/>
+
+  <rect
+  x="900"
+  y="320"
+  width="180"
+  height="110"
+  rx="22"
+  class="server-box"/>
+
+  <rect
+  x="240"
+  y="420"
+  width="180"
+  height="110"
+  rx="22"
+  class="server-box"/>
+
+  <!-- NODES -->
+
+  <circle
+  cx="610"
+  cy="215"
+  r="10"
+  class="network-node"/>
+
+  <circle
+  cx="990"
+  cy="375"
+  r="10"
+  class="network-node"/>
+
+  <circle
+  cx="330"
+  cy="475"
+  r="10"
+  class="network-node"/>
+
+  <circle
+  cx="700"
+  cy="560"
+  r="10"
+  class="network-node"/>
+
+  <!-- LINES -->
+
+  <line
+  x1="610"
+  y1="215"
+  x2="990"
+  y2="375"
+  class="network-line"/>
+
+  <line
+  x1="990"
+  y1="375"
+  x2="700"
+  y2="560"
+  class="network-line"/>
+
+  <line
+  x1="700"
+  y1="560"
+  x2="330"
+  y2="475"
+  class="network-line"/>
+
+  <line
+  x1="330"
+  y1="475"
+  x2="610"
+  y2="215"
+  class="network-line"/>
+
+</svg>
 
 </div>
 
-      <h1>Let’s talk</h1>
+<!-- =========================
+     JOIN SCREEN
+========================= -->
 
-      <p class="subtitle">
-        Secure Realtime Glassmorphic Chat
-      </p>
+<div
+class="join-screen"
+id="joinScreen">
 
-      <input
-        type="text"
-        id="username-input"
-        placeholder="Enter username"
-      />
+  <div class="join-card">
 
-      <button id="join-btn">
-        Join Chat
+    <!-- LOGO -->
+
+    <div class="logo-circle">
+
+      <img
+      src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+      alt="logo">
+
+    </div>
+
+    <!-- TITLE -->
+
+    <h1>Let's Talk</h1>
+
+    <p class="subtitle">
+
+      Modern Secure LAN Chat
+      with Voice Notes,
+      File Sharing & Emoji Chat
+
+    </p>
+
+    <!-- USERNAME -->
+
+    <input
+    type="text"
+    id="username"
+    placeholder="Enter username">
+
+    <br><br>
+
+    <!-- JOIN -->
+
+    <button onclick="joinChat()">
+
+      Join Network
+
+    </button>
+
+  </div>
+
+</div>
+
+<!-- =========================
+     CHAT CONTAINER
+========================= -->
+
+<div
+class="chat-container hidden"
+id="chatContainer">
+
+  <!-- =========================
+       SIDEBAR
+  ========================= -->
+
+  <div class="sidebar">
+
+    <!-- TOP -->
+
+    <div class="sidebar-top">
+
+      <div>
+
+        <h2>LAN Users</h2>
+
+        <span>
+          Connected Devices
+        </span>
+
+      </div>
+
+      <button class="theme-btn">
+
+        📡
+
       </button>
 
     </div>
 
-  </section>
+    <!-- SEARCH -->
 
-  <!-- CHAT CONTAINER -->
+    <div class="search-box">
 
-  <section class="chat-container hidden" id="chat-container">
+      <input
+      type="text"
+      placeholder="Search user">
 
-    <!-- SIDEBAR -->
+    </div>
 
-    <aside class="sidebar">
+    <!-- COUNTERS -->
 
-      <div class="sidebar-top">
+    <div style="margin-bottom:18px;">
 
-        <div>
-          <h2>Realtime Users</h2>
-          <span id="online-count">0 Users Online</span>
+      🟢 Online:
+      <span id="onlineCount">0</span>
+
+      <br><br>
+
+      📡 Devices:
+      <span id="deviceCount">0</span>
+
+    </div>
+
+    <!-- USER LIST -->
+
+    <div
+    class="user-list"
+    id="users">
+
+    </div>
+
+  </div>
+
+  <!-- =========================
+       CHAT AREA
+  ========================= -->
+
+  <div class="chat-area">
+
+    <!-- TOPBAR -->
+
+    <div class="chat-topbar">
+
+      <div class="topbar-left">
+
+        <!-- AVATAR -->
+
+        <div class="avatar">
+
+          LC
+
         </div>
 
-        <button class="theme-btn">
-          ✨
+        <!-- TEXT -->
+
+        <div>
+
+          <h3>
+            LAN Secure Room
+          </h3>
+
+         <span id="typing">
+
+Online
+
+</span>
+
+        </div>
+
+      </div>
+
+      <!-- QR -->
+
+      <div class="topbar-actions">
+
+        <button onclick="openQR()">
+
+          📱
+
         </button>
 
       </div>
 
-      <div class="search-box">
-        <input type="text" placeholder="Search user...">
-      </div>
+    </div>
 
-      <div class="user-list" id="user-list"></div>
+    <!-- =========================
+         MESSAGE AREA
+    ========================= -->
 
-      <div id="typing-indicator"></div>
+    <div
+    class="messages-container"
+    id="messages">
 
-    </aside>
+    </div>
 
-    <!-- CHAT AREA -->
+    <!-- =========================
+         COMPOSER
+    ========================= -->
 
-    <main class="chat-area">
+    <div class="composer">
 
-      <!-- TOPBAR -->
+      <!-- FILE -->
 
-      <div class="chat-topbar">
+      <label
+      for="fileInput"
+      class="theme-btn">
 
-        <div class="topbar-left">
-          <div class="avatar">V</div>
+      📎
 
-          <div>
-            <h3>LAN Room</h3>
-            <span>Realtime Messaging</span>
-          </div>
-        </div>
+      </label>
 
-        
-        </div>
-
-      </div>
-
-      <!-- MESSAGE AREA -->
-
-      <div class="messages-container" id="messages-container">
-
-      </div>
+      <input
+      type="file"
+      id="fileInput"
+      hidden>
 
       <!-- EMOJI -->
 
-      <div class="emoji-picker hidden" id="emoji-picker">
+      <button
+      class="theme-btn"
+      onclick="toggleEmojiPicker()">
 
-        <button class="emoji-item">😀</button>
-        <button class="emoji-item">😂</button>
-        <button class="emoji-item">🔥</button>
-        <button class="emoji-item">❤️</button>
-        <button class="emoji-item">👍</button>
-        <button class="emoji-item">🎉</button>
+      😊
 
-      </div>
+      </button>
 
-      <!-- COMPOSER -->
+      <!-- MESSAGE -->
 
-      <div class="composer">
+      <input
+      type="text"
+      id="messageInput"
+      placeholder="Type message...">
 
-        <button id="emoji-toggle">
-          😊
-        </button>
+      <!-- MIC -->
 
-        <input
-          type="text"
-          id="message-input"
-          placeholder="Type your message..."
-        />
+      <button
+      class="mic-btn"
+      onclick="startRecording()">
 
-        <button id="send-btn">
-          Send
-        </button>
+      🎤
 
-      </div>
+      </button>
 
-    </main>
+      <!-- SEND -->
 
-  </section>
+      <button
+id="sendBtn"
+onclick="sendMessage()">
 
-  <audio id="notify-sound" src="notify.mp3"></audio>
+➤
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="script.js"></script>
+</button>
+</div>
+    <!-- =========================
+         EMOJI PICKER
+    ========================= -->
+
+    <div
+    class="emoji-picker hidden"
+    id="emojiPicker">
+
+      <button
+      class="emoji-item"
+      onclick="addEmoji('😀')">
+
+      😀
+      </button>
+
+      <button
+      class="emoji-item"
+      onclick="addEmoji('😂')">
+
+      😂
+      </button>
+
+      <button
+      class="emoji-item"
+      onclick="addEmoji('😍')">
+
+      😍
+      </button>
+
+      <button
+      class="emoji-item"
+      onclick="addEmoji('🔥')">
+
+      🔥
+      </button>
+
+      <button
+      class="emoji-item"
+      onclick="addEmoji('❤️')">
+
+      ❤️
+      </button>
+
+      <button
+      class="emoji-item"
+      onclick="addEmoji('👍')">
+
+      👍
+      </button>
+
+      <button
+      class="emoji-item"
+      onclick="addEmoji('🎉')">
+
+      🎉
+      </button>
+
+      <button
+      class="emoji-item"
+      onclick="addEmoji('😎')">
+
+      😎
+      </button>
+
+      <button
+      class="emoji-item"
+      onclick="addEmoji('🥳')">
+
+      🥳
+      </button>
+
+      <button
+      class="emoji-item"
+      onclick="addEmoji('🤖')">
+
+      🤖
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- JS -->
+
+<script src="app.js"></script>
 
 </body>
 </html>
